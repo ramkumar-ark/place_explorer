@@ -14,10 +14,15 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AvailablePlacesComponent implements OnInit {
   places = signal<Place[] | undefined>(undefined);
+  isFetching = signal<boolean>(false);
   private httpClient = inject(HttpClient);
   ngOnInit() {
+    this.isFetching.set(true);
     this.httpClient
       .get<{ places: Place[] }>('http://localhost:3000/places')
-      .subscribe((resp) => this.places.set(resp.places));
+      .subscribe({
+        next: (resp) => this.places.set(resp.places),
+        complete: () => this.isFetching.set(false),
+      });
   }
 }
