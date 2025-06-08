@@ -15,6 +15,7 @@ import { HttpClient } from '@angular/common/http';
 export class AvailablePlacesComponent implements OnInit {
   places = signal<Place[] | undefined>(undefined);
   isFetching = signal<boolean>(false);
+  error = signal<string | null>(null);
   private httpClient = inject(HttpClient);
   ngOnInit() {
     this.isFetching.set(true);
@@ -23,6 +24,13 @@ export class AvailablePlacesComponent implements OnInit {
       .subscribe({
         next: (resp) => this.places.set(resp.places),
         complete: () => this.isFetching.set(false),
+        error: (err) => {
+          this.isFetching.set(false);
+          console.error(err);
+          this.error.set(
+            'Some thing went wrong fetching available places. Please try again later.'
+          );
+        },
       });
   }
 }
