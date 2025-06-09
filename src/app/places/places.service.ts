@@ -57,7 +57,24 @@ export class PlacesService {
     );
   }
 
-  removeUserPlace(place: Place) {}
+  removeUserPlace(placeId: string) {
+    return this.httpClient.delete(this.baseUrl + 'user-places/' + placeId).pipe(
+      tap({
+        next: () => {
+          this.loadUserPlaces();
+        },
+      }),
+      catchError((err) => {
+        console.error(err);
+        return throwError(
+          () =>
+            new Error(
+              'Something went wrong while removing the place. Please try again later.'
+            )
+        );
+      })
+    );
+  }
 
   private fetchPlaces(api_endpoint: string, errorMessage: string) {
     return this.httpClient

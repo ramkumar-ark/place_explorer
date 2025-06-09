@@ -1,10 +1,9 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 
 import { PlacesContainerComponent } from '../places-container/places-container.component';
 import { PlacesComponent } from '../places.component';
 import { Place } from '../place.model';
 import { PlacesService } from '../places.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-user-places',
@@ -18,8 +17,20 @@ export class UserPlacesComponent implements OnInit {
   places = this.placesService.loadedUserPlaces;
   error = this.placesService.userPlacesError$;
   isFetching = this.placesService.userPlacesLoading$;
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit() {
     this.placesService.loadUserPlaces();
+  }
+
+  onRemovePlace(place: Place) {
+    const subscription = this.placesService
+      .removeUserPlace(place.id)
+      .subscribe({
+        error: (err) => alert(err),
+      });
+    this.destroyRef.onDestroy(() => {
+      subscription.unsubscribe();
+    });
   }
 }
